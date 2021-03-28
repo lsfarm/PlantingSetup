@@ -3,10 +3,14 @@
 /////////************* **********/////////
 /*
 V0  - Time stamps
-V1-9 tank leel stuff
+V1  - blynkUpdate Interval
 V5  - motorKill>>to delete
-V10-20 tank level stuff
-
+V6-9 tank level stuff
+V6  - tankLevel
+V7  - calibratedLevel
+V10-15 battery stuff
+V10 - batteryVolt
+V11 - rawBatteryVolt (analogRead Value)
 V20 - sendtoblynkenable
 v21 - getBatVoltage();
 V23 - Relay 8(LPU Sennor) power toggle
@@ -15,10 +19,12 @@ V29 - motorKill >> discontinue??
 //////////********** Blynk **********//////////
 #include <blynk.h>
 char auth[] = "DRwlkQMXGrxDVNGbPujY3IFNAjwJeX6p";  //DRwlkQMXGrxDVNGbPujY3IFNAjwJeX6p
+long blynkUpdateInterval = 60000L;
 BlynkTimer timer;
-int timerNA = 99;
-int batVoltMeterDelay = timerNA;
-bool sendtoblynkenable = 1;
+int timerNA             = 99;
+int batVoltMeterDelay   = timerNA;
+int blynkUpdateTimer = timerNA;
+bool sendtoblynkenable  = 1;
 
 #define LPUSig      A1 // HARDWARE CONNECTIONS: Boron A1 --> LPU Ground > Sensor Signal Line
 #define batIN12V    A2
@@ -91,6 +97,10 @@ int rawbatvolt = 22;
 //////////**********// End My Variables //**********////////// 
 
 //////////********** Blynk Stuff **********//////////
+BLYNK_WRITE(V1)  {
+    blynkUpdateInterval = param.asLong();
+    timer.changeInterval(blynkUpdateTimer, blynkUpdateInterval);
+}
 BLYNK_WRITE(V20)  {
     sendtoblynkenable = param.asInt(); // assigning incoming value from pin to a variable
 }
@@ -125,7 +135,7 @@ void setup() {
   ThingSpeak.begin(client);
   Blynk.begin(auth);
   //timer.setInterval(5000L, readLPUSensor);
-  timer.setInterval(5000L, writeTOblynk);  //60000
+  blynkUpdateTimer = timer.setInterval(blynkUpdateInterval, writeTOblynk);  //60000
   //timer.setInterval(300000L, writeGPS2ThingSpeak); //this is called ifmoved()
   timer.setInterval(59000L, checkmovement);     //every minute
   timer.setInterval(601000L, checksmallmove);   //every 10 minute
@@ -215,8 +225,8 @@ void writeGPS2ThingSpeak()  {
 void writeTOblynk()  {
     if(sendtoblynkenable == 1)  {
         Blynk.virtualWrite(V0, Time.format("%r - %a %D"));
-        Blynk.virtualWrite(V1, tankLevel); 
-        Blynk.virtualWrite(V2, calibratedlevel);
+        Blynk.virtualWrite(V6, tankLevel); 
+        Blynk.virtualWrite(V7, calibratedlevel);
         Blynk.virtualWrite(V5, motorkilllockout);
         
         Blynk.virtualWrite(V10, batteryVolts);
@@ -320,10 +330,3 @@ void checksmallmove()  {
   }
   ifmoved();
 } //end checkmovement loop
-
-
-
-
-
-
-

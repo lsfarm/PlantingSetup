@@ -1,58 +1,57 @@
+//Installed on Uno in juction box 4/10/2021 this is the connection between hetronic out (wire#12 0-5V) and 5K digtial pot to control iGX 390 RPM
+
 #include <SPI.h>
 byte address = 0x00;
 int CS = 10;
-int hetronicIN = A5;
+//int hetronicIN = A1;
 int currentPosition;
 int goalSpeed;
 int lastSpeed;
+byte PMW_PIN = 3;
+int pmwValue;
 
-//////////////***********Loop SPI Code***********//////////////////
-    /*for (int i = 0; i <= 128; i++)
-    {
-       digitalPotWrite(i);
-       delay(10); 
-    }
-    delay(500);
-    for (int i = 128; i >= 0; i--)
-    {
-       digitalPotWrite(i);
-       delay(500);
-    }
-    
-    int i = 25;
-    digitalPotWrite(i);
-    delay(1000);*/
-
-int digitalPotWrite(int value)
-{
-digitalWrite(CS, LOW);
-SPI.transfer(address);
-SPI.transfer(value);
-digitalWrite(CS, HIGH);
+int digitalPotWrite(int value) {
+  digitalWrite(CS, LOW);
+  SPI.transfer(address);
+  SPI.transfer(value);
+  digitalWrite(CS, HIGH);
 }
-
-
 
 void setup() {
   pinMode (CS, OUTPUT);
-  pinMode (hetronicIN , INPUT);
+  //pinMode (hetronicIN , INPUT);
+  pinMode (PMW_PIN, INPUT);
   SPI.begin();
   Serial.begin(9600);
 }
 
 void loop() {
-  currentPosition = analogRead(hetronicIN);
-  goalSpeed = map(currentPosition, 0, 1023, 0, 4);
-  if(goalSpeed != lastSpeed) {
-    int potMap = map(goalSpeed, 0, 4, 0, 127);
-    digitalPotWrite(potMap);
-  }
-  //Serial.println(currentPosition);
+  //currentPosition = analogRead(hetronicIN);
+  pmwValue = pulseIn(PMW_PIN, HIGH);
+  Serial.print("PMW: ");
+  Serial.println(pmwValue);
+  //goalSpeed = map(currentPosition, 0, 1023, 0, 4);
+  if(pmwValue < 500  &&                    goalSpeed != 0) {goalSpeed = 0; digitalPotWrite(0); Serial.print("SpeedChanged: "); Serial.println(goalSpeed);}
+  if(pmwValue > 600  && pmwValue < 1200 && goalSpeed != 1) {goalSpeed = 1; digitalPotWrite(5); delay(2000); digitalPotWrite(12); delay(2000); digitalPotWrite(22); }
+  if(pmwValue > 1600 && pmwValue < 2200 && goalSpeed != 2) {goalSpeed = 2; digitalPotWrite(60); Serial.print("SpeedChanged: "); Serial.println(goalSpeed);}
+  if(pmwValue > 2600 && pmwValue < 3200 && goalSpeed != 3) {goalSpeed = 3; digitalPotWrite(95); Serial.print("SpeedChanged: "); Serial.println(goalSpeed);}
+  if(pmwValue > 3600 &&                    goalSpeed != 4) {goalSpeed = 4; digitalPotWrite(127); Serial.print("SpeedChanged: "); Serial.println(goalSpeed);}
+  /*if (goalSpeed != lastSpeed) {
+    lastSpeed = goalSpeed;
+    Serial.print("SpeedChanged: ");
+    Serial.println(goalSpeed);
+  }*/
+  Serial.print("CurrentPostion: ");
+  Serial.println(currentPosition);
+  Serial.print("goalSpeed: ");
+  Serial.println(goalSpeed);
+  delay(1000);
 }
 
 
 
 /*
+550-640 - off
 
   //CHANNEL 6 CODE  Pump Speed Dial Idle==1000 IB==  1A== 1==1200  2==1500  3==1800 4==2000
   //Speed input tracking to be tracked digtially or with pot SW on actuator??
@@ -114,4 +113,4 @@ void loop() {
     SpeedLock = 1;
   }
 
-  */
+*/

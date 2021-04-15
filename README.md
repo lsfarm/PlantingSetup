@@ -8,6 +8,7 @@ Also in this repo are the [TechManual](https://github.com/lsfarm/PlantingSetup/b
 
 
 4-15-21 the RPM input device from Design Tech is not reliable. If we could get this device working all the problems listed here would be solved. But I'm running out of time to mess with this device. I need to get the hetronic device setup where it acts like the rpm input device doesn't even exist. Anything above an idle cause Comm Error on hetronic TX. I'd like to leave the rpm input connected, but the comm error may get so annoying that I end up disconnecting rpm input altogether.  
+
 Hetronic Re-programming  
 - Starting motor: since we can't rely on rpm feedback for bump start, only hold starter on for 1 sec instead of 5.  
 - When RPM feedback drops out motor goes back to idle and sometimes shuts off. Set this where RPM setpoint is allways whatever TX commands -- no logic to go back to idle  

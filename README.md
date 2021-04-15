@@ -11,5 +11,5 @@ Also in this repo are the [TechManual](https://github.com/lsfarm/PlantingSetup/b
 
 Hetronic Re-programming  
 - Starting motor: since we can't rely on rpm feedback for bump start, only hold starter on for 1 sec instead of 5.  
-- When RPM feedback drops out motor goes back to idle and sometimes shuts off. Set this where RPM setpoint is allways whatever TX commands -- no logic to go back to idle  
+- When RPM feedback drops out motor goes back to idle and sometimes shuts off. Set this where RPM setpoint is allways whatever TX commands -- no logic to go back to idle -- Steps: Start motor, rpm shows 1,800, command 25%RPM on TX, RPM shows 2,300, command 50%RPM on TX, rpm begins to drop out shows 0-2,500, when RPM feedback stays on 0, TX automaticly commands 0%rpm and sometimes even shuts off the motor. I'll try making a video of this issue.  
 - Allow boom valve to be opened and closed any time TX commands it -- right now its only possible to open it when motor is running -- it needs to stay open after motor shuts off to drain the boom.  
